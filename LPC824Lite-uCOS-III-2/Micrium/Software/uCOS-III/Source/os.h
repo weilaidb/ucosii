@@ -61,7 +61,6 @@
 #include <trace_os.h>
 #endif
 
-
 /*
 ************************************************************************************************************************
 *                                               CRITICAL SECTION HANDLING
@@ -1928,6 +1927,8 @@ CPU_BOOLEAN   OSTmrStop                 (OS_TMR                *p_tmr,
                                          OS_OPT                 opt,
                                          void                  *p_callback_arg,
                                          OS_ERR                *p_err);
+
+nihaoma
 
 /* ------------------------------------------------ INTERNAL FUNCTIONS ---------------------------------------------- */
 

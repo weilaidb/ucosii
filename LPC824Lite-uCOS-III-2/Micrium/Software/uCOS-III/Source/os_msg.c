@@ -1,3 +1,57 @@
+
+void  *OS_MsgQGet (OS_MSG_Q     *p_msg_q,
+                   OS_MSG_SIZE  *p_msg_size,
+                   CPU_TS       *p_ts,
+                   OS_ERR       *p_err)
+{
+    OS_MSG  *p_msg;
+    void    *p_void;
+
+
+
+#ifdef OS_SAFETY_CRITICAL
+    if (p_err == (OS_ERR *)0) {
+        OS_SAFETY_CRITICAL_EXCEPTION();
+        return ((void *)0);
+    }
+#endif
+
+    if (p_msg_q->NbrEntries == (OS_MSG_QTY)0) {             /* Is the queue empty?                                    */
+       *p_msg_size = (OS_MSG_SIZE)0;                        /* Yes                                                    */
+        if (p_ts != (CPU_TS *)0) {
+           *p_ts  = (CPU_TS  )0;
+        }
+       *p_err = OS_ERR_Q_EMPTY;
+        return ((void *)0);
+    }
+
+    p_msg           = p_msg_q->OutPtr;                      /* No, get the next message to extract from the queue     */
+    p_void          = p_msg->MsgPtr;
+   *p_msg_size      = p_msg->MsgSize;
+    if (p_ts != (CPU_TS *)0) {
+       *p_ts  = p_msg->MsgTS;
+    }
+
+    p_msg_q->OutPtr = p_msg->NextPtr;                       /* Point to next message to extract                       */
+
+    if (p_msg_q->OutPtr == (OS_MSG *)0) {                   /* Are there any more messages in the queue?              */
+        p_msg_q->InPtr      = (OS_MSG   *)0;                /* No                                                     */
+        p_msg_q->NbrEntries = (OS_MSG_QTY)0;
+    } else {
+        p_msg_q->NbrEntries--;                              /* Yes, One less message in the queue                     */
+    }
+
+    p_msg->NextPtr    = OSMsgPool.NextPtr;                  /* Return message control block to free list              */
+    OSMsgPool.NextPtr = p_msg;
+    OSMsgPool.NbrFree++;
+    OSMsgPool.NbrUsed--;
+
+   *p_err             = OS_ERR_NONE;
+    return (p_void);
+}
+
+
+
 /*
 ************************************************************************************************************************
 *                                                      uC/OS-III
@@ -207,58 +261,6 @@ void  OS_MsgQInit (OS_MSG_Q    *p_msg_q,
 * Note(s)    : 1) This function is INTERNAL to uC/OS-III and your application MUST NOT call it.
 ************************************************************************************************************************
 */
-
-void  *OS_MsgQGet (OS_MSG_Q     *p_msg_q,
-                   OS_MSG_SIZE  *p_msg_size,
-                   CPU_TS       *p_ts,
-                   OS_ERR       *p_err)
-{
-    OS_MSG  *p_msg;
-    void    *p_void;
-
-
-
-#ifdef OS_SAFETY_CRITICAL
-    if (p_err == (OS_ERR *)0) {
-        OS_SAFETY_CRITICAL_EXCEPTION();
-        return ((void *)0);
-    }
-#endif
-
-    if (p_msg_q->NbrEntries == (OS_MSG_QTY)0) {             /* Is the queue empty?                                    */
-       *p_msg_size = (OS_MSG_SIZE)0;                        /* Yes                                                    */
-        if (p_ts != (CPU_TS *)0) {
-           *p_ts  = (CPU_TS  )0;
-        }
-       *p_err = OS_ERR_Q_EMPTY;
-        return ((void *)0);
-    }
-
-    p_msg           = p_msg_q->OutPtr;                      /* No, get the next message to extract from the queue     */
-    p_void          = p_msg->MsgPtr;
-   *p_msg_size      = p_msg->MsgSize;
-    if (p_ts != (CPU_TS *)0) {
-       *p_ts  = p_msg->MsgTS;
-    }
-
-    p_msg_q->OutPtr = p_msg->NextPtr;                       /* Point to next message to extract                       */
-
-    if (p_msg_q->OutPtr == (OS_MSG *)0) {                   /* Are there any more messages in the queue?              */
-        p_msg_q->InPtr      = (OS_MSG   *)0;                /* No                                                     */
-        p_msg_q->NbrEntries = (OS_MSG_QTY)0;
-    } else {
-        p_msg_q->NbrEntries--;                              /* Yes, One less message in the queue                     */
-    }
-
-    p_msg->NextPtr    = OSMsgPool.NextPtr;                  /* Return message control block to free list              */
-    OSMsgPool.NextPtr = p_msg;
-    OSMsgPool.NbrFree++;
-    OSMsgPool.NbrUsed--;
-
-   *p_err             = OS_ERR_NONE;
-    return (p_void);
-}
-
 
 /*
 ************************************************************************************************************************

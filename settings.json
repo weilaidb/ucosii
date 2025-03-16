@@ -1,0 +1,11 @@
+{
+    "filewatcher.commands": [
+        {
+            "match": "\\.(c|cpp|h)", // 监测的文件类型，可以根据需要修改
+            "cmd": "extension.regenerateCTags", // 直接调用扩展命令
+            "args": [],
+            "isAsync": true, // 是否异步执行
+            "event": "onFolderChange"
+        }
+    ]
+}

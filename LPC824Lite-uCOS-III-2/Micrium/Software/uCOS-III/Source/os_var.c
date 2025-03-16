@@ -40,3 +40,30 @@
 #ifdef VSC_INCLUDE_SOURCE_FILE_NAMES
 const  CPU_CHAR  *os_var__c = "$Id: $";
 #endif
+helo
+abc_t  os_tick_list_head;
+
+
+afd
+fdafdsf
+fdsafd
+
+ofdsafdo
+void hello (void)
+{
+
+}
+
+nifsfd
+hello2 (void)
+{
+
+}
+
+#if OS_CFG_TASK_REG_TBL_SIZE > 0
+static  CPU_INT08U  OSTaskRegNextAvailID;
+#endif
+
+
+
+fdfsdf
